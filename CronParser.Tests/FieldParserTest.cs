@@ -15,6 +15,16 @@ public class FieldParserTest
         
         actual.ShouldBeEquivalentTo(expected);
     }
+    
+    [Theory]
+    [InlineData("5", 0, 59, new[] { 5 })]
+    [InlineData("0", 0, 0, new[] { 0 })]
+    [InlineData("59", 0, 59, new[] { 59 })]
+    public void ParseSingleValue_ShouldReturn_SingleValue(string expression, int min, int max, int[] expected)
+    {
+        var actual = FieldParser.Parse(expression, min, max).ToArray();
+        actual.ShouldBeEquivalentTo(expected);
+    }
 
     [Theory]
     [InlineData("1-3", 1, 60, new[] { 1, 2, 3 })]
@@ -62,5 +72,11 @@ public class FieldParserTest
         var actual = FieldParser.Parse(expression, min, max).ToArray();
         
         actual.ShouldBeEquivalentTo(expected);
+    }
+    
+    [Fact]
+    public void Parse_MixedExpressionWithInvalidPart_ShouldThrow()
+    {
+        Assert.Throws<FormatException>(() => FieldParser.Parse("1-3,failHere", 0, 10));
     }
 }

@@ -29,7 +29,7 @@ public static class FieldParser
       if (part.Contains('-'))
          return ParseRange(part, min, max);
      
-      return [0];
+      return [ParseSingle(part, min, max)];
    }
 
    private static IEnumerable<int> ParseStep(string part, int min, int max)
@@ -62,9 +62,21 @@ public static class FieldParser
 
       return Range(start, end);
    }
-
-   private static List<int> Range(int start, int end)
+   
+   private static int ParseSingle(string part, int min, int max)
    {
-      return Enumerable.Range(start, end - start + 1).ToList();
+      if (!int.TryParse(part, out var value))
+         throw new FormatException($"Invalid value: '{part}' is not a number.");
+
+      if (value < min || value > max)
+         throw new ArgumentOutOfRangeException($"Value '{value}' out of range [{min}-{max}].");
+
+      return value;
+   }
+
+
+   private static IEnumerable<int> Range(int start, int end)
+   {
+      return Enumerable.Range(start, end - start + 1);
    }
 }
