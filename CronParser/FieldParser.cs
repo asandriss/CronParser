@@ -7,10 +7,41 @@ public static class FieldParser
       if(string.IsNullOrWhiteSpace(expression))
          throw new ArgumentException("Expression cannot be null or empty.", nameof(expression));
 
-      if (expression == "*")
+      var values = new SortedSet<int>();
+
+      foreach (var part in expression.Split(','))
+      {
+         var partValues = ParsePart(part.Trim(), min, max);
+         values.UnionWith(partValues);
+      }
+
+      return values.ToList();
+   }
+
+   private static IEnumerable<int> ParsePart(string part, int min, int max)
+   {
+      if (part == "*")
          return Range(min, max);
 
+      if (part.Contains('-'))
+         return ParseRange(part, min, max);
+      
       return [0];
+   }
+
+   private static IEnumerable<int> ParseRange(string part, int min, int max)
+   {
+      var values = part.Split('-').Select(int.Parse).ToArray();
+      if (values.Length != 2)
+         throw new FormatException($"Invalid range provided {part}");
+
+      int start = values[0];
+      int end = values[1];
+
+      if (start < min || end > max)
+         throw new ArgumentOutOfRangeException($"Range {part} out of bounds [{min}-{max}]");
+
+      return Range(start, end);
    }
 
    private static List<int> Range(int start, int end)
