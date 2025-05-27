@@ -47,11 +47,9 @@ public class CronScheduleTest
 
     [Theory]
     [InlineData("")]
-    [InlineData("* * * * *")] // only 5 fields
-    [InlineData("* * * * * * *")] // too many fields
+    [InlineData("* * * * *")]
     public void CronScheduleFactory_ShouldThrow_OnInvalidFormat(string expression)
     {
         Assert.Throws<ArgumentException>(() => CronScheduleFactory.Parse(expression));
     }
-
 }

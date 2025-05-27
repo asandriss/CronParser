@@ -74,7 +74,6 @@ public static class FieldParser
       return value;
    }
 
-
    private static IEnumerable<int> Range(int start, int end)
    {
       return Enumerable.Range(start, end - start + 1);

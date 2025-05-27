@@ -51,6 +51,5 @@ To run all tests:
 
 ## Example
 
-`dotnet run -- "*/10 9-17 * * 1-5 echo 'Hello World'"`
-
+`dotnet run --project CronParser "*/10 9-17 * * 1-5 echo 'Hello World'"`
 This represents a command that runs every 10 minutes during working hours on weekdays.
