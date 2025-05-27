@@ -25,8 +25,23 @@ public static class FieldParser
 
       if (part.Contains('-'))
          return ParseRange(part, min, max);
+
+      if (part.Contains('/'))
+         return ParseStep(part, min, max);
       
       return [0];
+   }
+
+   private static IEnumerable<int> ParseStep(string part, int min, int max)
+   {
+      var values = part.Split('/');
+      if (values.Length != 2)
+         throw new FormatException($"Invalid step expressions provided: {part}");
+
+      var basePart = values[0];
+      var step = int.Parse(values[1]);
+
+      return Range(min, max).Where(v => (v - min) % step == 0);
    }
 
    private static IEnumerable<int> ParseRange(string part, int min, int max)

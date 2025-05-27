@@ -24,4 +24,13 @@ public class FieldParserTest
         
         actual.ShouldBeEquivalentTo(expected);
     }
+
+    [Fact]
+    public void ParseSteps_ShouldReturn_CorrectValues()
+    {
+        var actual = FieldParser.Parse("*/2", 0, 5);
+        var expected = new List<int> { 0, 2, 4 };
+        
+        actual.ShouldBeEquivalentTo(expected);
+    }
 }
