@@ -4,7 +4,7 @@ public static class CronScheduleFactory
 {
    public static CronSchedule Parse(string expression)
    {
-      var parts = expression.Split(' ', 6);
+      var parts = expression.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
       if (parts.Length != 6)
          throw new ArgumentException("Cron expression must contain 5 time fields and a command");

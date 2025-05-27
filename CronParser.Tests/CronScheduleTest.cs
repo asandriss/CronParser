@@ -5,7 +5,7 @@ namespace CronParser.Tests;
 public class CronScheduleTest
 {
     [Fact]
-    public void CronSchedulePrinter_ShouldPrint_CurrectlyFormattedOutput()
+    public void CronSchedulePrinter_ShouldRender_FullCorrectTable()
     {
         var schedule = new CronSchedule(
             [0, 15, 30, 45],
@@ -14,13 +14,44 @@ public class CronScheduleTest
             Enumerable.Range(1, 12).ToList(),
             [1, 2, 3, 4, 5],
             "/usr/bin/find"
-            );
+        );
 
         using var sw = new StringWriter();
         CronSchedulePrinter.Print(schedule, sw);
 
-        var actual = sw.ToString().Trim();
-        actual.ShouldContain("minute        0 15 30 45");
-        actual.ShouldContain("command       /usr/bin/find");
+        var expected = string.Join(Environment.NewLine, [
+            "minute        0 15 30 45",
+            "hour          0",
+            "day of month  1 15",
+            "month         1 2 3 4 5 6 7 8 9 10 11 12",
+            "day of week   1 2 3 4 5",
+            "command       /usr/bin/find"
+        ]);
+
+        sw.ToString().Trim().ShouldBe(expected);
     }
+
+    [Fact]
+    public void CronScheduleFactory_ShouldParse_ValidExpression()
+    {
+        var input = "*/15 0 1,15 * 1-5 /usr/bin/find";
+        var schedule = CronScheduleFactory.Parse(input);
+
+        schedule.Minutes.ShouldBe([0, 15, 30, 45]);
+        schedule.Hours.ShouldBe([0]);
+        schedule.DaysOfMonth.ShouldBe([1, 15]);
+        schedule.Months.ShouldBe(Enumerable.Range(1, 12).ToList());
+        schedule.DaysOfWeek.ShouldBe([1, 2, 3, 4, 5]);
+        schedule.Command.ShouldBe("/usr/bin/find");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("* * * * *")] // only 5 fields
+    [InlineData("* * * * * * *")] // too many fields
+    public void CronScheduleFactory_ShouldThrow_OnInvalidFormat(string expression)
+    {
+        Assert.Throws<ArgumentException>(() => CronScheduleFactory.Parse(expression));
+    }
+
 }
