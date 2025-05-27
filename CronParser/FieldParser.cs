@@ -22,13 +22,13 @@ public static class FieldParser
    {
       if (part == "*")
          return Range(min, max);
-
-      if (part.Contains('-'))
-         return ParseRange(part, min, max);
-
+      
       if (part.Contains('/'))
          return ParseStep(part, min, max);
-      
+ 
+      if (part.Contains('-'))
+         return ParseRange(part, min, max);
+     
       return [0];
    }
 
@@ -41,7 +41,11 @@ public static class FieldParser
       var basePart = values[0];
       var step = int.Parse(values[1]);
 
-      return Range(min, max).Where(v => (v - min) % step == 0);
+      var baseRange = basePart == "*" 
+         ? Range(min, max).ToArray() 
+         : ParsePart(basePart, min, max).ToArray();
+
+      return baseRange.Where(v => (v - baseRange.Min()) % step == 0);
    }
 
    private static IEnumerable<int> ParseRange(string part, int min, int max)
