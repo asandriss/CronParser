@@ -16,15 +16,37 @@ public class FieldParserTest
         actual.ShouldBeEquivalentTo(expected);
     }
 
-    [Fact]
-    public void ParseRange_ShouldReturn_ValuesInRange()
+    [Theory]
+    [InlineData("1-3", 1, 60, new[] { 1, 2, 3 })]
+    [InlineData("5-5", 1, 60, new[] { 5 })]
+    [InlineData("1-7", 1, 60, new[] {1, 2, 3, 4, 5, 6, 7 })]
+    [InlineData("59-60", 1, 60, new[] { 59, 60 })]
+    [InlineData("1-1", 1, 60, new[] { 1 })]
+    [InlineData("30-31", 1, 31, new[] { 30, 31 })]
+    public void ParseRange_ShouldReturn_ValuesInRange(string expression, int min, int max, int[] expected)
     {
-        var actual = FieldParser.Parse("1-3", 1, 60);
-        var expected = new List<int> { 1, 2, 3 };
-        
+        var actual = FieldParser.Parse(expression, min, max).ToArray();
         actual.ShouldBeEquivalentTo(expected);
     }
 
+    [Theory]
+    [InlineData("1-", 1, 60)]
+    [InlineData("-5", 1, 60)]
+    [InlineData("a-b", 1, 60)]
+    public void ParseRange_ShouldThrow_OnInvalidRangeFormat(string expression, int min, int max)
+    {
+        Assert.Throws<FormatException>(() => FieldParser.Parse(expression, min, max).ToArray());
+    }
+
+    [Theory]
+    [InlineData("5-1", 1, 60)]
+    [InlineData("0-5", 1, 60)]
+    [InlineData("1-61", 1, 60)]
+    public void ParseRange_ShouldThrow_OnOutOfBoundsRange(string expression, int min, int max)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => FieldParser.Parse(expression, min, max).ToArray());
+    }
+ 
     [Theory]
     [InlineData("*/2", 0, 5, new[] {0, 2, 4})]
     [InlineData("*/5", 0, 20, new[] {0, 5, 10, 15, 20})]
