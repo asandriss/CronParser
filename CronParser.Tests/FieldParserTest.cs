@@ -1,10 +1,7 @@
-using CronParser;
-using JetBrains.Annotations;
 using Shouldly;
 
 namespace CronParser.Tests;
 
-[TestSubject(typeof(FieldParser))]
 public class FieldParserTest
 {
     [Fact]
@@ -73,9 +70,26 @@ public class FieldParserTest
         
         actual.ShouldBeEquivalentTo(expected);
     }
-    
+
+    [Theory]
+    [InlineData("1,2,3", 0, 59, new[] {1,2,3})]
+    [InlineData("1,2,3,2,2,2,1,3", 0, 59, new[] {1,2,3})]
+    [InlineData("1-3,2-5", 0, 59, new[] {1,2,3,4,5})]
+    [InlineData("1-3,1-3,1-3", 0, 59, new[] {1,2,3})]
+    [InlineData("1-3,5-6", 0, 59, new[] {1,2,3,5,6})]
+    [InlineData("5,4,3,2,1", 0, 59, new[] {1,2,3,4,5})]
+    [InlineData("10,10,10,10", 0, 59, new[] {10})]
+    [InlineData("*/20,0-5", 0, 59, new[] {0,1,2,3,4,5,20,40})]
+    [InlineData("1-5,*/20,*/30", 0, 59, new[] {0,1,2,3,4,5,20,30,40})]
+    public void MultipeCombinationsOfCommaSeparatedValues_ShouldReturn_SortedSetOfValuesWithoutDuplicates(string expression, int min, int max, int[] expected)
+    {
+        var actual = FieldParser.Parse(expression, min, max).ToArray();
+        
+        actual.ShouldBeEquivalentTo(expected);
+    }
+
     [Fact]
-    public void Parse_MixedExpressionWithInvalidPart_ShouldThrow()
+    public void Parse_ShouldThrow_OnMixedExpressionWithInvalidPart()
     {
         Assert.Throws<FormatException>(() => FieldParser.Parse("1-3,failHere", 0, 10));
     }
