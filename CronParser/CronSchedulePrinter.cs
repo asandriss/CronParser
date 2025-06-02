@@ -9,6 +9,8 @@ public static class CronSchedulePrinter
       PrintField(writer, "day of month", schedule.DaysOfMonth);
       PrintField(writer, "month", schedule.Months);
       PrintField(writer, "day of week", schedule.DaysOfWeek);
+      if(schedule.Year.Count > 0)
+         PrintField(writer, "year", schedule.Year );
       
       writer.WriteLine($"{ "command",-14}{schedule.Command}");
    }

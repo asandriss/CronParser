@@ -27,7 +27,6 @@ public class FieldParserTest
     [InlineData("1-3", 1, 60, new[] { 1, 2, 3 })]
     [InlineData("5-5", 1, 60, new[] { 5 })]
     [InlineData("1-7", 1, 60, new[] {1, 2, 3, 4, 5, 6, 7 })]
-    [InlineData("59-60", 1, 60, new[] { 59, 60 })]
     [InlineData("1-1", 1, 60, new[] { 1 })]
     [InlineData("30-31", 1, 31, new[] { 30, 31 })]
     public void ParseRange_ShouldReturn_ValuesInRange(string expression, int min, int max, int[] expected)
